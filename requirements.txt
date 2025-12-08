@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pydantic
+prometheus-fastapi-instrumentator
+SQLAlchemy
+Pillow
+numpy
+rich
+python-dotenv
+requests
+psycopg2-binary
+opencv-python-headless
+psycopg2-binary

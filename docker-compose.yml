@@ -1,0 +1,57 @@
+services:
+  app:
+    build: .
+    container_name: qoves-app
+    ports:
+      - "8000:8000"
+    environment:
+      # Inside the compose network, Postgres is reachable at host "db"
+      - DATABASE_URL=postgresql+psycopg2://qoves:qoves@db:5432/qoves
+      # Enable / disable SVG result caching in Postgres
+      - CACHE_ENABLED=1          # 1 = cache ON, 0 = cache OFF
+      # 0 = normal mode (keep artificial delay in background jobs)
+      # 1 = loadtest mode (skip artificial delay, max throughput)
+      - LOADTEST_MODE=0
+      # Default simulated delay in seconds when LOADTEST_MODE=0
+      - JOB_DELAY_SECONDS=20
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+
+  db:
+    image: postgres:16
+    container_name: qoves-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=qoves
+      - POSTGRES_USER=qoves
+      - POSTGRES_PASSWORD=qoves
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qoves -d qoves"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.54.0
+    container_name: qoves-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+
+volumes:
+  postgres_data:

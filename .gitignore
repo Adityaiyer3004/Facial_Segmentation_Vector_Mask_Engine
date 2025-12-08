@@ -1,0 +1,23 @@
+cat > .gitignore << 'EOF'
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual env
+.venv/
+
+# OS junk
+.DS_Store
+
+# Secrets / env
+.env
+
+# Local Postgres volume
+postgres_data/
+
+# Logs
+*.log
+
+# Generated image outputs (keep SVGs, ignore heavy PNGs)
+output/*.png
+EOF
