@@ -448,7 +448,7 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 7\. Running the Project
 -----------------------
 
-This is the bit you were asking about – these are the **install & run** instructions.
+This is the bit you were asking about, these are the **install & run** instructions.
 
 ### 7.1 Local (SQLite, no Docker)
 
@@ -458,6 +458,8 @@ This is the bit you were asking about – these are the **install & run** instru
     
 *   virtualenv / venv
     
+
+```bash
 
 git clone <REPO_URL> qoves-task
 cd qoves-task
@@ -478,150 +480,3 @@ export JOB_DELAY_SECONDS=20
 
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-
-Then open:
-
-*   Swagger / OpenAPI: http://localhost:8000/docs
-    
-*   Health check: http://localhost:8000/health
-    
-*   Prometheus metrics: http://localhost:8000/metrics
-    
-
-Use sample\_payload.json as the request body to test /frontal/crop/submit.
-
-### 7.2 Docker / docker-compose (Postgres + Prometheus)
-
-Ensure Docker is running, then:
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   cd qoves-task  docker compose up --build   `
-
-This will start:
-
-*   qoves-app on http://localhost:8000
-    
-*   qoves-db (Postgres) on localhost:5432
-    
-*   qoves-prometheus on http://localhost:9090
-    
-
-The app container is configured in docker-compose.yml with:
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   environment:    - DATABASE_URL=postgresql+psycopg2://qoves:qoves@db:5432/qoves    - CACHE_ENABLED=1    - LOADTEST_MODE=0    - JOB_DELAY_SECONDS=20   `
-
-To run in **loadtest mode**, override:
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   LOADTEST_MODE=1 JOB_DELAY_SECONDS=20 docker compose up --build   `
-
-(or edit the environment: block).
-
-8\. Configuration Summary
--------------------------
-
-Env varDefaultDescriptionDATABASE\_URLsqlite:///./qoves\_cache.dbDB connection string (SQLite local / Postgres in Docker)CACHE\_ENABLED"1""1" = use DB cache, "0" = always recomputeLOADTEST\_MODE"0""1" = disable artificial job delayJOB\_DELAY\_SECONDS"20"Simulated delay when LOADTEST\_MODE=0
-
-9\. Testing
------------
-
-With the virtual environment active:
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   pytest   `
-
-Tests (in tests/) cover:
-
-*   Happy-path /frontal/crop/submit:
-    
-    *   returns HTTP 200
-        
-    *   non-empty svg
-        
-    *   non-empty mask\_contours
-        
-*   Basic async job flow: /crop/submit → /crop/status/{id}
-    
-
-Additional tests can be added for edge cases and error paths.
-
-10\. Mapping to Task Criteria
------------------------------
-
-### Minimum Criteria
-
-*   docker compose up --build brings up **all services** with no manual edits.
-    
-*   POST /api/v1/frontal/crop/submit:
-    
-    *   Accepts the expected payload (image, landmarks, segmentation).
-        
-    *   Returns svg + mask\_contours in the required structure.
-        
-*   Clear error mapping:
-    
-    *   All “no useful face” scenarios → HTTP 422 { "detail": "NoFace" }.
-        
-
-### Moderate Criteria
-
-*   Autorotation of the input image using eye landmarks.
-    
-*   Landmark-driven frontal crop that generalises beyond the provided example.
-    
-*   Smooth, production-ready mask overlays:
-    
-    *   segmentation-based polygon extraction
-        
-    *   morphological smoothing
-        
-    *   consistent colours and dashed outlines
-        
-*   Clean, modular FastAPI design:
-    
-    *   routers separate from services
-        
-    *   independent overlay core
-        
-    *   database abstraction
-        
-
-### Advanced / Bonus Criteria
-
-*   **Bonus #1 – Async / non-blocking job system**
-    
-    *   /crop/submit + /crop/status/{id} with simulated delay
-        
-*   **Bonus #2 – Persistent caching**
-    
-    *   processed\_images table storing SVG + contours keyed by deterministic hash
-        
-*   **Bonus #3 – Observability & infra**
-    
-    *   /metrics endpoint, Prometheus container configured in prometheus.yml
-        
-*   **Bonus #4 – Loadtesting mode**
-    
-    *   LOADTEST\_MODE=1 disables artificial delay so the API runs at maximum throughput
-        
-*   **Logging**
-    
-    *   Structured logs for:
-        
-        *   cache hits/misses
-            
-        *   job lifecycle
-            
-        *   image processing steps
-            
-
-11\. Possible Future Improvements
----------------------------------
-
-If given more time, I would:
-
-1.  Refine region naming to exactly match the numbered regions in the PDF and add more semantic masks (e.g. separate nose bridge vs. tip, split cheek regions).
-    
-2.  Add golden-file tests that compare generated SVGs against reference outputs.
-    
-3.  Introduce a proper task queue (Redis + RQ / Celery) instead of in-memory jobs for horizontal scaling.
-    
-4.  Integrate a face-parsing model directly so segmentation can be computed on the fly from raw images.
-    
