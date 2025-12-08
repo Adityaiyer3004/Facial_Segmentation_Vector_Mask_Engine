@@ -459,7 +459,25 @@ This is the bit you were asking about – these are the **install & run** instru
 *   virtualenv / venv
     
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   git clone  qoves-task  cd qoves-task  python -m venv .venv  source .venv/bin/activate  pip install --upgrade pip  pip install -r requirements.txt  # Use a local SQLite DB for caching  export DATABASE_URL="sqlite:///./qoves_cache.db"  # Optional flags  export CACHE_ENABLED=1  export LOADTEST_MODE=0  export JOB_DELAY_SECONDS=20  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000   `
+git clone <REPO_URL> qoves-task
+cd qoves-task
+
+python -m venv .venv
+source .venv/bin/activate
+
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Use a local SQLite DB for caching
+export DATABASE_URL="sqlite:///./qoves_cache.db"
+
+# Optional flags
+export CACHE_ENABLED=1
+export LOADTEST_MODE=0
+export JOB_DELAY_SECONDS=20
+
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
 
 Then open:
 
@@ -607,7 +625,3 @@ If given more time, I would:
     
 4.  Integrate a face-parsing model directly so segmentation can be computed on the fly from raw images.
     
-
-If you paste this into README.md, you’re fully covered on **install + run**, plus all the criteria / bonus points are explicitly mapped.
-
-Extended thinkingChatGPT can make mistakes. Check important info. See Cookie Preferences.
