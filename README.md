@@ -195,25 +195,69 @@ All endpoints are under the /api/v1 prefix.
 
 #### Request body
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "image": "",    "landmarks": [      { "x": 123.4, "y": 234.5 },      { "x": 130.0, "y": 240.0 }      // ...    ],    "segmentation_map": ""  }   `
+```
+
+{
+  "image": "<base64_encoded_original_image>",
+  "landmarks": [
+    { "x": 123.4, "y": 234.5 },
+    { "x": 130.0, "y": 240.0 }
+    // ...
+  ],
+  "segmentation_map": "<base64_encoded_segmentation_png>"
+}
+
+```
 
 #### Successful response (SVGResponse)
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "svg": "...",    "mask_contours": [      {        "id": 1,        "name": "right_cheek",        "points": [          { "x": 512.3, "y": 234.1 },          { "x": 520.0, "y": 240.0 }        ]      },      {        "id": 2,        "name": "right_undereye",        "points": [          { "x": 500.0, "y": 220.0 }          // ...        ]      }    ]  }   `
+```
+{
+  "svg": "<svg ...>...</svg>",
+  "mask_contours": [
+    {
+      "id": 1,
+      "name": "right_cheek",
+      "points": [
+        { "x": 512.3, "y": 234.1 },
+        { "x": 520.0, "y": 240.0 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "right_undereye",
+      "points": [
+        { "x": 500.0, "y": 220.0 }
+        // ...
+      ]
+    }
+  ]
+}
+
+```
 
 #### Error responses
 
 **No usable face / invalid crop / insufficient landmarks**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   HTTP 422  { "detail": "NoFace" }   `
-
+```
+HTTP 422
+{ "detail": "NoFace" }
+```
 **Other validation problems**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   HTTP 422  { "detail": "" }   `
+```
+HTTP 422
+{ "detail": "<error message>" }
+```
 
 **Unexpected internal error**
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   HTTP 500  { "detail": "Internal server error" }   `
+```
+HTTP 500
+{ "detail": "Internal server error" }
+
+```
 
 ### 3.2 Async Job-Style API (Bonus #1)
 
@@ -223,19 +267,35 @@ Same request body as /frontal/crop/submit.
 
 Returns immediately with a job ID and "pending" status:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id": "0eb347a3-a186-46dc-b9f6-69742924258c",    "status": "pending"  }   `
+```
+{
+  "id": "0eb347a3-a186-46dc-b9f6-69742924258c",
+  "status": "pending"
+}
 
+```
 The heavy work runs in a FastAPI BackgroundTasks worker.
 
 #### 3.2.2 GET /api/v1/crop/status/{job\_id}
 
 Returns job status plus SVG when completed:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   {    "id": "0eb347a3-a186-46dc-b9f6-69742924258c",    "status": "completed",      // "pending" | "completed" | "failed"    "result": "...",    "error": null               // e.g. "NoFace" on failure  }   `
+```
+{
+  "id": "0eb347a3-a186-46dc-b9f6-69742924258c",
+  "status": "completed",      // "pending" | "completed" | "failed"
+  "result": "<svg ...>...</svg>",
+  "error": null               // e.g. "NoFace" on failure
+}
 
+```
 Unknown job\_id:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   HTTP 404  { "detail": "Job not found" }   `
+```
+HTTP 404
+{ "detail": "Job not found" }
+
+```
 
 ### 3.3 POST /api/v1/crop/submit/raw
 
@@ -266,7 +326,7 @@ Useful for development and visual verification.
     
 *   Eye centres (left and right) are computed from their respective landmark groups.
     
-*   The angle between the eye line and horizontal is calculated.
+*   The angle between the eye line and the horizontal is calculated.
     
 *   The original image and the segmentation map are rotated together around the image centre using:
     
@@ -343,7 +403,17 @@ Region naming:
 
 Each RegionContour is rendered as:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML
+```
+<path
+  d="M x0 y0 L x1 y1 ... Z"
+  fill="#bf5fff"           <!-- for right_cheek -->
+  fill-opacity="0.35"
+  stroke="#ffffff"
+  stroke-width="2"
+  stroke-dasharray="6 4"
+/>
+
+```
 
 Colour scheme:
 
@@ -429,8 +499,14 @@ These read from environment variables:
 
 In run\_crop\_job:
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   delay = 0 if LOADTEST_MODE else JOB_DELAY_SECONDS  if delay > 0:      time.sleep(delay)  # simulate heavy processing   `
+```
+delay = 0 if LOADTEST_MODE else JOB_DELAY_SECONDS
 
+
+if delay > 0:
+    time.sleep(delay)  # simulate heavy processing
+`
+```
 **Normal mode (default):**
 
 *   /crop/submit responds immediately with "pending".
@@ -483,6 +559,159 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 
 ```
+### 7.2 Docker / docker-compose (Postgres + Prometheus)
 
-vb.nblbh
+Ensure Docker is running, then:
 
+```
+cd qoves-task
+docker compose up --build\
+```
+
+This will start:
+
+*   qoves-app on http://localhost:8000
+    
+*   qoves-db (Postgres) on localhost:5432
+    
+*   qoves-prometheus on http://localhost:9090
+    
+
+The app container is configured in docker-compose.yml with:
+```
+environment:
+  - DATABASE_URL=postgresql+psycopg2://qoves:qoves@db:5432/qoves
+  - CACHE_ENABLED=1
+  - LOADTEST_MODE=0
+  - JOB_DELAY_SECONDS=20
+```
+
+To run in **loadtest mode**, override:
+
+```
+LOADTEST_MODE=1 JOB_DELAY_SECONDS=20 docker compose up --build
+```
+
+(or edit the environment: block).
+
+8\. Configuration Summary
+-------------------------
+
+```
+| Env var             | Default                      | Description                                           |
+| ------------------- | ---------------------------- | ----------------------------------------------------- |
+| `DATABASE_URL`      | `sqlite:///./qoves_cache.db` | DB connection string (SQLite local / Postgres Docker) |
+| `CACHE_ENABLED`     | `"1"`                        | `"1"` = use DB cache, `"0"` = always recompute        |
+| `LOADTEST_MODE`     | `"0"`                        | `"1"` = disable artificial job delay                  |
+| `JOB_DELAY_SECONDS` | `"20"`                       | Simulated delay when `LOADTEST_MODE=0`                |
+
+```
+
+9\. Testing
+-----------
+
+With the virtual environment active:
+
+```
+pytest  `
+
+```
+
+Tests (in tests/) cover:
+
+*   Happy-path /frontal/crop/submit:
+    
+    *   returns HTTP 200
+        
+    *   non-empty svg
+        
+    *   non-empty mask\_contours
+        
+*   Basic async job flow: /crop/submit → /crop/status/{id}
+    
+
+Additional tests can be added for edge cases and error paths.
+
+10\. Mapping to Task Criteria
+-----------------------------
+
+### Minimum Criteria
+
+*   docker compose up --build brings up **all services** with no manual edits.
+    
+*   POST /api/v1/frontal/crop/submit:
+    
+    *   Accepts the expected payload (image, landmarks, segmentation).
+        
+    *   Returns svg + mask\_contours in the required structure.
+        
+*   Clear error mapping:
+    
+    *   All “no useful face” scenarios → HTTP 422 { "detail": "NoFace" }.
+        
+
+### Moderate Criteria
+
+*   Autorotation of the input image using eye landmarks.
+    
+*   Landmark-driven frontal crop that generalises beyond the provided example.
+    
+*   Smooth, production-ready mask overlays:
+    
+    *   segmentation-based polygon extraction
+        
+    *   morphological smoothing
+        
+    *   consistent colours and dashed outlines
+        
+*   Clean, modular FastAPI design:
+    
+    *   routers separate from services
+        
+    *   independent overlay core
+        
+    *   database abstraction
+        
+
+### Advanced / Bonus Criteria
+
+*   **Bonus #1 – Async / non-blocking job system**
+    
+    *   /crop/submit + /crop/status/{id} with simulated delay
+        
+*   **Bonus #2 – Persistent caching**
+    
+    *   processed\_images table storing SVG + contours keyed by deterministic hash
+        
+*   **Bonus #3 – Observability & infra**
+    
+    *   /metrics endpoint, Prometheus container configured in prometheus.yml
+        
+*   **Bonus #4 – Loadtesting mode**
+    
+    *   LOADTEST\_MODE=1 disables artificial delay so the API runs at maximum throughput
+        
+*   **Logging**
+    
+    *   Structured logs for:
+        
+        *   cache hits/misses
+            
+        *   job lifecycle
+            
+        *   image processing steps
+            
+
+11\. Possible Future Improvements
+---------------------------------
+
+If given more time, I would:
+
+1.  Refine region naming to exactly match the numbered regions in the PDF and add more semantic masks (e.g., separate nose bridge vs. tip, split cheek regions).
+    
+2.  Add golden-file tests that compare generated SVGs against reference outputs.
+    
+3.  Introduce a proper task queue (Redis + RQ / Celery) instead of in-memory jobs for horizontal scaling.
+    
+4.  Integrate a face-parsing model directly so segmentation can be computed on the fly from raw images.
+    
