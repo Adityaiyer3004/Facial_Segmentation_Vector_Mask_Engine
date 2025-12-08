@@ -135,6 +135,12 @@ All endpoints are under the `/api/v1` prefix.
   ],
   "segmentation_map": "<base64_encoded_segmentation_png>"
 
+
+
+
+
+
+
 **3.1 Successful response (`SVGResponse`)**
 
 ```json
