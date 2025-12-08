@@ -461,6 +461,7 @@ This is the bit you were asking about, these are the **install & run** instructi
 
 ```bash
 
+
 git clone <REPO_URL> qoves-task
 cd qoves-task
 
@@ -480,5 +481,8 @@ export JOB_DELAY_SECONDS=20
 
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-... bash
+
+```
+
+vb.nblbh
 
